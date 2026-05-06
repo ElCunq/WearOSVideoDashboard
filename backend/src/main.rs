@@ -26,6 +26,8 @@ struct ProcessRequest {
 
 #[tokio::main]
 async fn main() {
+    println!(">>> WearOS Video Backend Starting Up...");
+    
     // Ensure essential directories exist
     fs::create_dir_all("uploads").await.unwrap();
     fs::create_dir_all("static/previews").await.unwrap();
