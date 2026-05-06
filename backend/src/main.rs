@@ -26,6 +26,11 @@ struct ProcessRequest {
 
 #[tokio::main]
 async fn main() {
+    // Add panic hook to see errors in logs
+    std::panic::set_hook(Box::new(|panic_info| {
+        println!(">>> CRITICAL ERROR (PANIC): {}", panic_info);
+    }));
+
     println!(">>> WearOS Video Backend Starting Up...");
     
     // Ensure essential directories exist
