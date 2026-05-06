@@ -1,0 +1,247 @@
+:root {
+  --primary: #6366f1;
+  --primary-hover: #4f46e5;
+  --bg: #0b0f1a;
+  --card-bg: #1e293b;
+  --text: #f8fafc;
+  --text-muted: #64748b;
+  --border: #334155;
+  --screen-size: 450px;
+  --frame-size: 650px;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  background-color: var(--bg);
+  color: var(--text);
+  overflow: hidden;
+  background: radial-gradient(circle at center, #1a2333 0%, #0b0f1a 100%);
+}
+
+.app-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.header {
+  position: absolute;
+  top: 1.5rem;
+  text-align: center;
+  z-index: 20;
+}
+
+.header h1 {
+  font-size: 1rem;
+  font-weight: 800;
+  color: #fff;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+}
+
+.main-layout {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+}
+
+.editor-container {
+  position: relative;
+  width: var(--frame-size);
+  height: var(--frame-size);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 5;
+}
+
+.watch-frame {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  z-index: 10;
+  pointer-events: none;
+  background-image: url('/watch_frame.png');
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  filter: brightness(1.1) contrast(1.1) drop-shadow(0 0 30px rgba(0,0,0,0.8));
+  mask-image: radial-gradient(circle, transparent 34%, black 35%, black 48%, transparent 49%);
+  -webkit-mask-image: radial-gradient(circle, transparent 34%, black 35%, black 48%, transparent 49%);
+}
+
+.screen-area {
+  position: absolute;
+  width: var(--screen-size);
+  height: var(--screen-size);
+  border-radius: 50%;
+  overflow: hidden;
+  z-index: 5;
+  background: #000;
+}
+
+.video-wrapper {
+  position: absolute;
+  cursor: grab;
+  user-select: none;
+  transform-origin: center;
+}
+
+.mask-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 15;
+  background: radial-gradient(
+    circle calc(var(--screen-size) / 2 + 30px) at center,
+    transparent 100%,
+    rgba(11, 15, 26, 0.4) 100%
+  );
+}
+
+/* ULTRA SLIM Precision Controls */
+.precision-controls {
+  position: fixed;
+  right: 1.5rem;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  gap: 0.5rem;
+  z-index: 100;
+}
+
+.precision-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(15, 23, 42, 0.5);
+  backdrop-filter: blur(20px);
+  padding: 1rem 0.2rem;
+  border-radius: 100px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.precision-group label {
+  font-size: 0.45rem;
+  font-weight: 800;
+  color: #fff;
+  writing-mode: vertical-rl;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  opacity: 0.4;
+}
+
+.precision-group input[type="number"] {
+  width: 28px;
+  background: transparent;
+  border: none;
+  color: #fff;
+  font-size: 0.6rem;
+  text-align: center;
+  outline: none;
+}
+
+.vertical-slider-container {
+  height: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.vertical-slider {
+  -webkit-appearance: none;
+  width: 200px;
+  height: 2px;
+  background: rgba(255,255,255,0.1);
+  transform: rotate(-90deg);
+  outline: none;
+}
+
+.vertical-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 10px;
+  height: 10px;
+  background: #fff;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.controls {
+  position: absolute;
+  bottom: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  background: rgba(30, 41, 59, 0.6);
+  backdrop-filter: blur(24px);
+  padding: 1.25rem;
+  border-radius: 28px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  width: 380px;
+  z-index: 20;
+}
+
+.btn-primary {
+  background: #fff;
+  color: #000;
+  font-weight: 800;
+  border-radius: 100px;
+  padding: 1rem;
+  text-transform: uppercase;
+  border: none;
+  cursor: pointer;
+}
+
+/* FIXING UPLOAD BUTTON ACCESS */
+.upload-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 30;
+  cursor: pointer;
+  color: #64748b;
+  transition: color 0.3s;
+}
+
+.upload-overlay:hover {
+  color: #fff;
+}
+
+/* Native file input should be invisible but cover the entire area */
+.upload-overlay input[type="file"] {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+  z-index: 31;
+}
+
+.spinner {
+  width: 24px;
+  height: 24px;
+  border: 3px solid rgba(255, 255, 255, 0.1);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}

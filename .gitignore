@@ -1,0 +1,16 @@
+# Build artifacts
+target/
+dist/
+node_modules/
+
+# Runtime data
+uploads/
+static/previews/
+static/loop.mp4
+static/version.json
+
+# IDE & OS
+.vscode/
+.idea/
+.DS_Store
+.env
