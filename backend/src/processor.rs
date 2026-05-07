@@ -62,7 +62,8 @@ pub async fn process_video(
     };
 
     let scale = if pixel_shift { "454:454" } else { "450:450" };
-    let crop_filter = format!("crop={}:{}:{}:{},scale={}", width, height, x, y, scale);
+    // Scale to 640 width first (matches preview) then crop using frontend coordinates
+    let crop_filter = format!("scale=640:-1,crop={}:{}:{}:{},scale={}", width, height, x, y, scale);
 
     let status = Command::new("ffmpeg")
         .args(&[

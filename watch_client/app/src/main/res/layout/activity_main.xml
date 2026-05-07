@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#000000">
+
+    <!-- Video 454x454 olarak işlenmiştir, ekran 450x450'dir -->
+    <VideoView
+        android:id="@+id/videoView"
+        android:layout_width="454px"
+        android:layout_height="454px"
+        android:layout_gravity="center" />
+
+</FrameLayout>

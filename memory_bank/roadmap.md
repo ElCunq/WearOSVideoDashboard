@@ -18,6 +18,11 @@ Sistemin geliştirilme aşamaları ve teknik detayları.
     - Uçtan uca video yükleme, işleme ve izleme testleri.
     - Isı yönetimi ve bitrate kontrollerinin doğrulanması.
 
+4.  **Aşama: WearOS Client Geliştirme**
+    - Minimal Android projesinin oluşturulması.
+    - Player logic ve Pixel Shifting entegrasyonu.
+    - Otomatik senkronizasyon (Auto-sync) mekanizmasının kurulması.
+
 ## Power-User Özellikleri
 
 ### A. AMOLED Koruma (Pixel Shifting)
