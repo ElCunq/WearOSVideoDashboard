@@ -73,8 +73,8 @@ public class MainActivity extends Activity {
                 if (currentVersion == -1) runOnUiThread(this::playLocalVideo);
             } finally {
                 isSyncing = false;
-                // 2 dakika sonra tekrar kontrol et
-                handler.postDelayed(this::startSync, 2 * 60 * 1000);
+                // 30 saniye sonra tekrar kontrol et
+                handler.postDelayed(this::startSync, 30 * 1000);
             }
         }).start();
     }

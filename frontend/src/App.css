@@ -249,7 +249,12 @@ body {
   position: absolute;
   cursor: grab;
   user-select: none;
-  transform-origin: center;
+  transform-origin: top left; /* Align with backend coordinate system */
+}
+
+.video-wrapper video {
+  width: 640px; /* Match backend preview scale exactly */
+  display: block;
 }
 
 .mask-overlay {
