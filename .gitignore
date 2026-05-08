@@ -2,15 +2,27 @@
 target/
 dist/
 node_modules/
+backend/target/
+frontend/dist/
+frontend/node_modules/
+
+# Android / Watch Client
+watch_client/.gradle/
+watch_client/build/
+watch_client/app/build/
+watch_client/local.properties
+watch_client/*.apk
 
 # Runtime data
 uploads/
 static/previews/
 static/loop.mp4
 static/version.json
+static/*.mp4
 
 # IDE & OS
 .vscode/
 .idea/
 .DS_Store
 .env
+*.log
