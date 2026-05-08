@@ -23,6 +23,7 @@ pub async fn generate_preview(file_id: &str) -> Result<String, String> {
             "-i", final_input.to_str().unwrap(),
             "-vf", "scale=640:-2",
             "-c:v", "libx264",
+            "-pix_fmt", "yuv420p", // Ensure compatibility for GIF/WebP
             "-preset", "ultrafast",
             "-crf", "28",
             "-an",
@@ -63,7 +64,8 @@ pub async fn process_video(
 
     let scale = if pixel_shift { "454:454" } else { "450:450" };
     // Scale to 640 width first (matches preview) then crop using frontend coordinates
-    let crop_filter = format!("scale=640:-1,crop={}:{}:{}:{},scale={}", width, height, x, y, scale);
+    // Using -2 ensures the height is always divisible by 2 (required for x264/yuv420p)
+    let crop_filter = format!("scale=640:-2,crop={}:{}:{}:{},scale={}", width, height, x, y, scale);
 
     let status = Command::new("ffmpeg")
         .args(&[
