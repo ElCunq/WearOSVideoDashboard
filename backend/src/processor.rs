@@ -63,9 +63,12 @@ pub async fn process_video(
     };
 
     let scale = if pixel_shift { "454:454" } else { "450:450" };
-    // Scale to 640 width first (matches preview) then crop using frontend coordinates
-    // Using -2 ensures the height is always divisible by 2 (required for x264/yuv420p)
-    let crop_filter = format!("scale=640:-2,crop={}:{}:{}:{},scale={}", width, height, x, y, scale);
+    // Scale to 640 width first. Then crop, but ensure the crop area doesn't exceed video boundaries (iw, ih)
+    // to prevent "Invalid too big" errors.
+    let crop_filter = format!(
+        "scale=640:-2,crop=min(iw\\,{w}):min(ih\\,{h}):min(iw-min(iw\\,{w})\\,max(0\\,{x})):min(ih-min(ih\\,{h})\\,max(0\\,{y})),scale={s}",
+        w = width, h = height, x = x, y = y, s = scale
+    );
 
     let status = Command::new("ffmpeg")
         .args(&[
