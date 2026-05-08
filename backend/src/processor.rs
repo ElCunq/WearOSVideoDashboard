@@ -152,8 +152,10 @@ async fn extract_video_from_pkg(path: &str, file_id: &str) -> Result<PathBuf, St
         file_names.push(name.clone());
         
         let lower_name = name.to_lowercase();
-        if lower_name.ends_with(".mp4") || lower_name.ends_with(".webm") || lower_name.ends_with(".mkv") {
-            // Priority to larger video files
+        if lower_name.ends_with(".mp4") || lower_name.ends_with(".webm") || lower_name.ends_with(".mkv") || 
+           lower_name.ends_with(".webp") || lower_name.ends_with(".gif") || 
+           lower_name.ends_with(".png") || lower_name.ends_with(".jpg") || lower_name.ends_with(".jpeg") {
+            // Priority to larger files
             if let Some((_, _, old_len)) = video_file_info {
                 if length > old_len {
                     video_file_info = Some((name, offset, length));
