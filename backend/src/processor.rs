@@ -17,19 +17,31 @@ pub async fn generate_preview(file_id: &str) -> Result<String, String> {
         PathBuf::from(&input_path)
     };
 
+    let mut ffmpeg_args = vec![
+        "-y".to_string(),
+    ];
+
+    if final_input.extension().and_then(|s| s.to_str()).unwrap_or("").to_lowercase() == "webp" {
+        ffmpeg_args.push("-vcodec".to_string());
+        ffmpeg_args.push("libwebp".to_string());
+    }
+
+    ffmpeg_args.extend(vec![
+        "-probesize".to_string(), "10M".to_string(),
+        "-analyzeduration".to_string(), "10M".to_string(),
+        "-i".to_string(), final_input.to_str().unwrap().to_string(),
+        "-vf".to_string(), "scale=640:-2".to_string(),
+        "-c:v".to_string(), "libx264".to_string(),
+        "-pix_fmt".to_string(), "yuv420p".to_string(),
+        "-preset".to_string(), "ultrafast".to_string(),
+        "-crf".to_string(), "28".to_string(),
+        "-an".to_string(),
+        "-movflags".to_string(), "faststart".to_string(),
+        output_path.to_string(),
+    ]);
+
     let status = Command::new("ffmpeg")
-        .args(&[
-            "-y",
-            "-i", final_input.to_str().unwrap(),
-            "-vf", "scale=640:-2",
-            "-c:v", "libx264",
-            "-pix_fmt", "yuv420p", // Ensure compatibility for GIF/WebP
-            "-preset", "ultrafast",
-            "-crf", "28",
-            "-an",
-            "-movflags", "faststart",
-            &output_path,
-        ])
+        .args(&ffmpeg_args)
         .status()
         .map_err(|e| e.to_string())?;
 
@@ -70,22 +82,35 @@ pub async fn process_video(
         w = width, h = height, x = x, y = y, s = scale
     );
 
+    let mut ffmpeg_args = vec![
+        "-y".to_string(),
+    ];
+
+    // Force libwebp only for webp files to support animation
+    if final_input.extension().and_then(|s| s.to_str()).unwrap_or("").to_lowercase() == "webp" {
+        ffmpeg_args.push("-vcodec".to_string());
+        ffmpeg_args.push("libwebp".to_string());
+    }
+
+    ffmpeg_args.extend(vec![
+        "-probesize".to_string(), "10M".to_string(),
+        "-analyzeduration".to_string(), "10M".to_string(),
+        "-i".to_string(), final_input.to_str().unwrap().to_string(),
+        "-vf".to_string(), crop_filter,
+        "-c:v".to_string(), "libx264".to_string(),
+        "-profile:v".to_string(), "baseline".to_string(),
+        "-level".to_string(), "3.0".to_string(),
+        "-an".to_string(),
+        "-pix_fmt".to_string(), "yuv420p".to_string(),
+        "-r".to_string(), "30".to_string(),
+        "-b:v".to_string(), "1.5M".to_string(),
+        "-maxrate".to_string(), "2M".to_string(),
+        "-bufsize".to_string(), "2M".to_string(),
+        output_path.to_string(),
+    ]);
+
     let status = Command::new("ffmpeg")
-        .args(&[
-            "-y",
-            "-i", final_input.to_str().unwrap(),
-            "-vf", &crop_filter,
-            "-c:v", "libx264",
-            "-profile:v", "baseline",
-            "-level", "3.0",
-            "-an",
-            "-pix_fmt", "yuv420p",
-            "-r", "30",
-            "-b:v", "1.5M",
-            "-maxrate", "2M",
-            "-bufsize", "2M",
-            output_path,
-        ])
+        .args(&ffmpeg_args)
         .status()
         .map_err(|e| e.to_string())?;
 
