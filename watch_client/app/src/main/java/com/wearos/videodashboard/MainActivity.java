@@ -39,11 +39,19 @@ public class MainActivity extends Activity {
         startPixelShift();
     }
 
+    private boolean isSyncing = false;
+
     private void startSync() {
+        if (isSyncing) return;
+        
         new Thread(() -> {
+            isSyncing = true;
             try {
                 URL url = new URL(serverUrl + "/static/version.json");
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                conn.setConnectTimeout(5000);
+                conn.setReadTimeout(5000);
+                
                 BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
                 StringBuilder sb = new StringBuilder();
                 String line;
@@ -55,12 +63,18 @@ public class MainActivity extends Activity {
                 if (newVersion > currentVersion) {
                     downloadVideo();
                     currentVersion = newVersion;
-                } else {
+                } else if (currentVersion == -1) {
+                    // İlk açılışta sürüm aynı olsa bile (cache) videoyu oynat
                     runOnUiThread(this::playLocalVideo);
+                    currentVersion = newVersion;
                 }
             } catch (Exception e) {
                 e.printStackTrace();
-                runOnUiThread(this::playLocalVideo);
+                if (currentVersion == -1) runOnUiThread(this::playLocalVideo);
+            } finally {
+                isSyncing = false;
+                // 2 dakika sonra tekrar kontrol et
+                handler.postDelayed(this::startSync, 2 * 60 * 1000);
             }
         }).start();
     }

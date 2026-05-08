@@ -98,11 +98,11 @@ pub async fn process_video(
         .await
         .map_err(|e| e.to_string())?;
 
-    let _ = fs::remove_file(&input_path).await;
-    if final_input != Path::new(&input_path) {
-        let _ = fs::remove_file(&final_input).await;
-    }
+    fs::write(version_path, serde_json::to_string_pretty(&version_info).unwrap())
+        .await
+        .map_err(|e| e.to_string())?;
 
+    // No longer removing input_path to allow for library management
     Ok(())
 }
 

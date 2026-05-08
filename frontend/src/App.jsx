@@ -12,9 +12,44 @@ function App() {
   const [pixelShift, setPixelShift] = useState(true);
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
+  const [libraryFiles, setLibraryFiles] = useState([]);
   const [status, setStatus] = useState('ready');
 
   const videoRef = useRef(null);
+
+  useEffect(() => {
+    fetchLibrary();
+  }, []);
+
+  const fetchLibrary = async () => {
+    try {
+      const response = await fetch('/files');
+      if (response.ok) {
+        const data = await response.json();
+        setLibraryFiles(data);
+      }
+    } catch (err) {
+      console.error('Kütüphane yüklenemedi:', err);
+    }
+  };
+
+  const deleteFile = async (id, e) => {
+    e.stopPropagation();
+    if (!window.confirm('Bu videoyu silmek istediğinize emin misiniz?')) return;
+    
+    try {
+      const response = await fetch(`/files/${id}`, { method: 'DELETE' });
+      if (response.ok) {
+        fetchLibrary();
+        if (fileId === id) {
+          setVideoSrc(null);
+          setFileId(null);
+        }
+      }
+    } catch (err) {
+      alert('Silme hatası');
+    }
+  };
 
   const handleFileChange = async (e) => {
     const file = e.target.files[0];
@@ -37,6 +72,7 @@ function App() {
       const data = await response.json();
       setFileId(data.file_id);
       setVideoSrc(data.preview_url);
+      fetchLibrary();
       setStatus('ready');
     } catch (err) {
       console.error(err);
@@ -89,8 +125,7 @@ function App() {
       });
       if (response.ok) {
         alert('Video başarıyla işlendi!');
-        setVideoSrc(null);
-        setFileId(null);
+        // Keep the editor open but update status
       } else {
         const err = await response.text();
         alert('İşleme hatası: ' + err);
@@ -116,6 +151,37 @@ function App() {
       </header>
 
       <div className="main-layout">
+        {/* Kütüphane Paneli */}
+        <aside className="library-panel">
+          <div className="library-header">
+            <h3>MEDYA KÜTÜPHANESİ</h3>
+            <div className="upload-btn-mini">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+              <input type="file" onChange={handleFileChange} />
+            </div>
+          </div>
+          <div className="library-scroll">
+            {libraryFiles.map(file => (
+              <div 
+                key={file.id} 
+                className={`library-item ${fileId === file.id ? 'active' : ''}`}
+                onClick={() => { setFileId(file.id); setVideoSrc(file.preview_url); }}
+              >
+                <div className="item-preview">
+                  <video src={file.preview_url} muted onMouseOver={e => e.target.play()} onMouseOut={e => {e.target.pause(); e.target.currentTime = 0;}} />
+                </div>
+                <div className="item-info">
+                  <span className="item-name">{file.name}</span>
+                </div>
+                <button className="delete-btn" onClick={(e) => deleteFile(file.id, e)}>
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                </button>
+              </div>
+            ))}
+            {libraryFiles.length === 0 && <div className="empty-library">Henüz video yok</div>}
+          </div>
+        </aside>
+
         <main className="editor-container">
           <div className="watch-frame"></div>
           <div className="mask-overlay"></div>
@@ -128,7 +194,7 @@ function App() {
                   <polyline points="17 8 12 3 7 8"></polyline>
                   <line x1="12" y1="3" x2="12" y2="15"></line>
                 </svg>
-                <span style={{marginTop: '12px', fontSize: '0.7rem', fontWeight: '800', letterSpacing: '0.1em'}}>DOSYA YÜKLE</span>
+                <span style={{marginTop: '12px', fontSize: '0.7rem', fontWeight: '800', letterSpacing: '0.1em'}}>VİDEO YÜKLE</span>
                 <input type="file" onChange={handleFileChange} />
               </div>
             )}
@@ -136,7 +202,7 @@ function App() {
             {status === 'uploading' && (
               <div className="upload-overlay">
                 <div className="spinner"></div>
-                <span style={{marginTop: '12px', fontSize: '0.7rem'}}>HAZIRLANIYOR...</span>
+                <span style={{marginTop: '12px', fontSize: '0.7rem'}}>YÜKLENİYOR...</span>
               </div>
             )}
 
@@ -150,7 +216,7 @@ function App() {
                 }}
                 onMouseDown={handleMouseDown}
               >
-                <video ref={videoRef} src={videoSrc} autoPlay loop muted />
+                <video ref={videoRef} key={videoSrc} src={videoSrc} autoPlay loop muted />
               </div>
             )}
           </div>
@@ -246,14 +312,14 @@ function App() {
               className="btn btn-secondary" 
               onClick={() => {setVideoSrc(null); setFileId(null);}}
             >
-              VAZGEÇ
+              İPTAL
             </button>
             <button 
               className="btn btn-primary" 
               onClick={handleSave}
               disabled={status === 'processing'}
             >
-              {status === 'processing' ? 'İŞLENİYOR...' : 'KAYDET VE GÖNDER'}
+              {status === 'processing' ? 'İŞLENİYOR...' : 'SAATE GÖNDER'}
             </button>
           </div>
         </section>
